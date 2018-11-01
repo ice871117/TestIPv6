@@ -7,9 +7,14 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
+
+    lateinit var job: Job
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
 
     private lateinit var resultText: TextView
     private lateinit var envText: TextView
@@ -19,6 +24,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        job = Job()
+
         setContentView(R.layout.activity_main)
         searchEdit = findViewById(R.id.search_edit)
         resultText = findViewById(R.id.result_text)
@@ -44,14 +51,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        lastQuery?.cancel()
-        lastDetect?.cancel()
+        job.cancel()
     }
 
     private fun doResolve(toSearch: String) {
         resultText.text = "resolving..."
         lastQuery?.cancel()
-        lastQuery = GlobalScope.launch {
+        lastQuery = launch(Dispatchers.Default) {
             val ret = IPEnvironment.resolveDomain(toSearch)
             withContext(Main) {
                 resultText.text = ret
@@ -62,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     private fun doDetectNetEnv() {
         envText.text = "detecting..."
         lastDetect?.cancel()
-        lastDetect = GlobalScope.launch {
+        lastDetect = launch(Dispatchers.Default) {
             val ret = IPEnvironment.getLocalNetEnvironment("www.henanga.gov.cn")
             withContext(Main) {
                 envText.text = ret.toString()
