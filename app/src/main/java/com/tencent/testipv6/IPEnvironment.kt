@@ -121,7 +121,7 @@ object IPEnvironment {
                         v4IP.add(substring(ipStartIndex, ipEndIndex).trim())
                     }
                 } else {
-                    var v6Index = indexOf("inet6 addr")
+                    var v6Index = indexOf("inet6 addr:")
                     if (v6Index >= 0) {
                         val ipStartIndex = v6Index + "inet6 addr:".length
                         isLocalHost = isLocalHost || indexOf("scope: host") >= 0
