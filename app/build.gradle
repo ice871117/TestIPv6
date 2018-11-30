@@ -20,6 +20,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs'] //这里就不要再加abiFilter了
+        }
+    }
+
 }
 
 dependencies {
